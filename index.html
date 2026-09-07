@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#3167ad">
+    <title>现代汉语词典 第7版 | 在线查阅</title>
+    <link rel="icon" type="image/png" href="static/favicon.png">
+    <link rel="stylesheet" href="static/styles.css">
+</head>
+
+<body>
+    <div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+        <div class="gate-panel">
+            <div class="gate-step" id="gateAsk">
+                <h2 id="gateTitle">使用须知</h2>
+                <p>您是否为个人学习、研究或欣赏而使用本站，或已购买《现代汉语词典》第7版的实体书或电子书？</p>
+                <div class="gate-actions">
+                    <button class="btn primary" id="gateYes" type="button">是，继续使用</button>
+                    <button class="btn ghost" id="gateNo" type="button">否</button>
+                </div>
+            </div>
+            <div class="gate-step" id="gateDeny" hidden>
+                <h2>无法使用</h2>
+                <p>很抱歉，本站仅供个人学习、研究、欣赏，或已持有正版《现代汉语词典》第7版实体书/电子书的用户使用。</p>
+                <button class="btn ghost" id="gateBack" type="button">重新选择</button>
+            </div>
+        </div>
+    </div>
+
+    <header class="nav" id="nav">
+        <div class="nav-left">
+            <div class="title">
+                <b>现代汉语词典</b>
+                <small>第7版 · 商务印书馆</small>
+            </div>
+            <span class="badge" id="pageLabel">…</span>
+        </div>
+        <div class="nav-center">
+            <button class="btn icon" id="prevBtn" title="上一页">‹</button>
+            <input class="field jump" id="jump" type="number" min="1" max="1897" inputmode="numeric" title="跳转到第几张扫描页">
+            <span class="badge" id="pageProgress">5/1897</span>
+            <button class="btn icon" id="nextBtn" title="下一页">›</button>
+            <button class="btn ghost icon" id="zoomBtn" title="放大">⤢</button>
+        </div>
+        <div class="nav-right">
+            <button class="btn ghost icon" id="tocOpenBtn" title="目录" aria-label="目录">目</button>
+            <button class="btn ghost icon" id="dictOpenBtn" title="查字" aria-label="查字">查</button>
+            <button class="btn ghost icon" id="invertBtn" title="夜间反色" aria-label="夜间反色">◐</button>
+            <button class="btn ghost icon" id="helpOpenBtn" title="使用说明" aria-label="使用说明">?</button>
+        </div>
+    </header>
+
+    <div class="stage" id="stage" tabindex="-1">
+        <div class="deck" id="deck"></div>
+        <div class="blank-notice" id="blankNotice"><span>本页无内容</span></div>
+    </div>
+    <div class="tapzones" id="tapzones">
+        <div data-z="prev"></div><div data-z="mid"></div><div data-z="next"></div>
+    </div>
+    <button class="edge left" id="edgePrev" title="上一页" aria-label="上一页">‹</button>
+    <button class="edge right" id="edgeNext" title="下一页" aria-label="下一页">›</button>
+
+    <div class="panel-scrim" id="panelScrim"></div>
+    <aside class="panel" id="panel" data-tab="toc">
+        <div class="phead">
+            <div class="ptabs">
+                <button class="btn on" id="tabToc" type="button">目录</button>
+                <button class="btn" id="tabDict" type="button">查字</button>
+            </div>
+            <button class="btn ghost icon" id="panelClose" aria-label="关闭">✕</button>
+        </div>
+        <div class="pbody">
+            <div class="pview active" id="tocView">
+                <div class="toc-list" id="tocList"></div>
+            </div>
+            <div class="pview" id="dictView">
+                <div class="dict-search" id="dictSearch">
+                    <div class="shead">
+                        <button class="btn ghost icon sback" id="dictBackBtn" aria-label="返回结果">‹</button>
+                        <input class="field" id="dictInput" type="search" placeholder="汉字 / 词语 / 拼音，如 miao、xian4" autocomplete="off">
+                    </div>
+                    <div class="sresults" id="dictResults">
+                        <p class="shint">输入汉字、词语或拼音（如 miao、xian4）来查找并跳转到大致页码；也可以直接输入正文页码或章节名，如 999、附录。</p>
+                    </div>
+                    <div class="sdetail" id="dictDetail"></div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="zoom" id="zoom">
+        <button class="btn close" id="zoomClose">✕ 关闭</button>
+        <img id="zoomImg" alt="放大页面">
+    </div>
+
+    <div class="modal" id="helpModal" aria-hidden="true">
+        <div class="modal-backdrop" id="helpBackdrop"></div>
+        <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+            <button class="modal-close btn ghost icon" id="helpCloseBtn" type="button" aria-label="关闭说明">×</button>
+            <h2 id="helpTitle">使用说明</h2>
+            <ul>
+                <li>「查字」支持按汉字、词语或拼音查找字词头，命中后自动跳转到估算页码并显示原文；页码由拼音音节位置估算，可能与实际印刷页码相差一两页。</li>
+                <li>「查字」支持输入繁体字/词，会自动转换为简体后查找（本词典字词头均为简体）。</li>
+                <li>「查字」「目录」也都支持输入正文页码（如 999）或章节名（如 附录、miao）直接精确跳转。</li>
+                <li>「目录」列出全书章节与拼音音节的精确起始页。</li>
+            </ul>
+            <h3>翻页方式</h3>
+            <ul>
+                <li>键盘：← / → 、空格</li>
+                <li>鼠标：左右边缘按钮，或悬停后点击左右侧区域</li>
+                <li>触屏：左右滑动；触控板：横向双指滑动</li>
+                <li>点击页面中央可隐藏/显示工具栏；⤢ 可放大当前页</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="static/app.js"></script>
+</body>
+
+</html>
